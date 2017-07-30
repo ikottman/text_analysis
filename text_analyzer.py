@@ -1,19 +1,25 @@
+import io
+import csv
 import spacy
 
 class TextAnalyzer:
 
   @staticmethod
-  def analyze(text):
+  def analyze(text, title, author):
     nlp = spacy.load('en')
     doc = nlp(text)
     counts = TextAnalyzer.count_parts_of_speech(doc)
-    total = len(doc)
-    print("Total tokens: {:,}".format(total))
 
+    total = len(doc)
+
+    string_out = io.StringIO()
+    writer = csv.writer(string_out)
     for k in sorted(counts, key=counts.get, reverse=True):
       count = counts[k]
       percent = (count/total) * 100
-      print("{:<20} {:>10,} {:>10.0f}%".format(k, count, percent))
+      writer.writerow([title, author, k, count, percent, total])
+
+    return string_out.getvalue()
 
   @staticmethod
   def count_parts_of_speech(doc):
